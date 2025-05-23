@@ -16,9 +16,9 @@ st.set_page_config(
 st.title("Food Nutrition Analyzer")
 st.write("Take a photo or upload a food image to get nutritional information")
 
-# Create a sidebar for options
-st.sidebar.header("Settings")
-portion_size = st.sidebar.selectbox("Portion Size", ["small", "medium", "large"], index=1)
+# # Create a sidebar for options
+# st.sidebar.header("Settings")
+# portion_size = st.sidebar.selectbox("Portion Size", ["small", "medium", "large"], index=1)
 
 
 # Then modify your load_model function

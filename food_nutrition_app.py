@@ -425,7 +425,7 @@ def main():
     # Load model and nutrition data
     with st.spinner("Loading model and nutrition data..."):
         model = load_model()
-        nutrition_map = load_nutrition_data("Final_all_nutrition_per_serving.csv")
+        nutrition_map = load_nutrition_data("Final_key_value_pair.json")
 
     # Check if model loaded correctly
     if model is None:

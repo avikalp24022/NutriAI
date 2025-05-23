@@ -373,7 +373,7 @@ def predict_food_and_nutrition(image, model, nutrition_map):
         # else:
             # nutrition_result = nutrition_info
 
-    return nutrition_info
+    return predicted_food, nutrition_info
 
 def process_image(image, model, nutrition_map):
     """Process image and return prediction results"""
@@ -382,10 +382,10 @@ def process_image(image, model, nutrition_map):
         image = image.convert("RGB")
 
     # Get prediction
-    result = predict_food_and_nutrition(image, model, nutrition_map)
-    return result
+    predicted_food, nutrition_info = predict_food_and_nutrition(image, model, nutrition_map)
+    return predicted_food
 
-def display_results(result, image):
+def display_results(predicted_food, nutrition_info, image):
     """Display prediction results in a user-friendly format"""
     # Display image and prediction
     col1, col2 = st.columns([1, 1])
@@ -448,12 +448,12 @@ def main():
                 try:
                     # Process the image
                     image = Image.open(img_file_camera)
-                    result = process_image(image, model, nutrition_map)
+                    predicted_food, nutrition_info = process_image(image, model, nutrition_map)
 
-                    print(result)
+                    # print(result)
 
                     # Display results
-                    display_results(result, image)
+                    display_results(predicted_food, nutrition_info, image)
                 except Exception as e:
                     st.error(f"Error processing image: {e}")
 

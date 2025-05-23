@@ -391,10 +391,10 @@ def display_results(result, image):
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.image(image, caption=f"Predicted: {result['food_name']}", use_container_width=True)
+        st.image(image, caption=f"Predicted: {result}", use_container_width=True)
 
     with col2:
-        st.subheader(f"Food: {result['food_name']}")
+        st.subheader(f"Food: {result}")
 
         # Display nutrition information
         st.subheader("Nutrition Information")

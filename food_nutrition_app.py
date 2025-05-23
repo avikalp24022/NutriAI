@@ -468,7 +468,7 @@ def main():
             with st.spinner("Analyzing food..."):
                 try:
                     # Process the image
-                    image = Image.open(img_file_camera)
+                    image = Image.open(uploaded_file)
                     predicted_food, nutrition_info = process_image(image, model, nutrition_map)
 
                     # print(result)

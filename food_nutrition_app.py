@@ -468,11 +468,13 @@ def main():
             with st.spinner("Analyzing food..."):
                 try:
                     # Process the image
-                    image = Image.open(uploaded_file)
-                    result = process_image(image, model, nutrition_map)
+                    image = Image.open(img_file_camera)
+                    predicted_food, nutrition_info = process_image(image, model, nutrition_map)
+
+                    # print(result)
 
                     # Display results
-                    display_results(result, image)
+                    display_results(predicted_food, nutrition_info, image)
                 except Exception as e:
                     st.error(f"Error processing image: {e}")
 

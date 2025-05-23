@@ -26,8 +26,8 @@ portion_size = st.sidebar.selectbox("Portion Size", ["small", "medium", "large"]
 def load_model():
     """Load and configure the Gemini Pro Vision model"""
     try:
-        genai.configure(api_key="AIzaSyB7J2toPbIOC0dZho2mJNIy1cReogQnmDw")
-        model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        model = genai.GenerativeModel('gemini-pro-vision')
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")
@@ -45,10 +45,9 @@ def load_nutrition_data(file_path):
         nutrition_map = {}
 
         # Group by food label and create entries for each food
-        for label, group in nutrition_df.groupby('label'):
+        for label, group in nutrition_df.groupby('Dish'):
             # Convert numeric columns to appropriate types
-            for col in ['weight', 'calories', 'protein', 'carbohydrates',
-                        'fats', 'fiber', 'sugars', 'sodium']:
+            for col in ["Dish","Per Serving Household Measure","B-Carotene","Calcium","Carbohydrate","Cholesterol","Dietary fibre","Energy","Iron","Monounsaturated fat","Phosphorus","Polyunsaturated fat","Potassium","Protein","Retinol","Riboflavin","Saturated fat","Selenium","Sodium","Starch","Sugar","Thiamin","Total fat","Vitamin A","Vitamin C","Vitamin D","Water","Whole-grains","Zinc"]:
                 group[col] = pd.to_numeric(group[col], errors='coerce')
 
             # Store all portion sizes for each food
@@ -71,98 +70,108 @@ def predict_food_and_nutrition(image, model, nutrition_map, portion_size='medium
         "Bak Kut Teh",
         "Fish Head Curry",
         "Hokkien Mee",
-        "Barbecued Sambal Stingray",
+        "Sambal Stingray",
         "Mee Goreng",
         "Fried Carrot Cake",
         "Kaya Toast",
         "Roti Prata",
         "Satay",
         "Oyster Omelette",
-        "Prawn Noodles",
-        "Bak Chor Mee",
-        "Wanton Mee",
+        "Prawn noodle",
+        # "Bak Chor Mee",
+        # "Wanton Mee",
         "Popiah",
         "Curry Puff",
         "Dim Sum",
         "Duck Rice",
-        "Frog Porridge",
-        "Teochew Porridge",
+        # "Frog Porridge",
+        "rice Porridge",
         "Lor Mee",
         "Mee Rebus",
         "Mee Siam",
-        "Min Jiang Kueh",
-        "Nasi Padang",
+        "Apam balik",
+        # "Nasi Padang",
         "Korean Bulgogi Beef",
         "Ngoh Hiang",
         "Kway Chap",
         "Ice Kachang",
-        "Cendol",
-        "Pandan Cake",
+        "Chendol",
+        "Pandan Chiffon Cake",
         "Briyani",
         "Beef Rendang",
-        "Ma la Xiang Guo (Spicy Hotpot)",
-        "Har Cheong Gai (Prawn Paste Wings)",
+        "Ma la Xiang Guo",
+        # "Har Cheong Gai",
         "Roast Duck Rice",
         "Roti John",
-        "Thunder Tea Rice (Lei Cha Fan)",
-        "Economy Rice (Cai Fan)",
-        "Lontong (Vegetable Curry with Rice Cakes)",
+        "Thunder Tea Rice",
+        # "Economy Rice",
+        "Lontong",
         "Sambal Stingray",
-        "Vadai (Indian Savory Snack)",
-        "Durian Fritters",
-        "Chee Cheong Fun (Rice Noodle Rolls)",
-        "Kueh Tutu (Steamed Rice Cakes)",
-        "Gulai Daun Ubi (Sweet Potato Leaves in Coconut Milk)",
-        "Ayam Penyet (Smashed Fried Chicken)",
-        "Ban Mian soup (Handmade Noodles in Soup)",
-        "Beef Kway Teow (Stir-Fried Flat Rice Noodles with Beef)",
+        "Vadai",
+        "Durian",
+        "Chee Cheong Fun",
+        "Kueh Tutu",
+        # "Gulai Daun Ubi",
+        "Ayam Penyet",
+        "Ban Mian soup",
+        "Beef Kway Teow",
         "Beef Noodle Soup",
-        "Chwee Kueh (Steamed Rice Cakes with Preserved Radish)",
+        "Chwee Kueh",
         "Claypot Rice",
-        "Crab Bee Hoon (Rice Vermicelli with Crab)",
+        # "Crab Bee Hoon",
         "Curry Chicken Noodles",
-        "Cereal Prawn (Prawns Stir-Fried with Sweetened Cereal)",
-        "Drunken Prawns (Prawns Cooked in Chinese Wine)",
-        "Fish Soup Bee Hoon (Soup-Based Vermicelli Dish with Fish)",
+        "Cereal Prawn",
+        "Drunken Prawn",
+
+        "Fish Soup Bee Hoon",
         "Fish ball Noodles dry",
         "Pulut hitam",
-        "Ondeh ondeh",
-        "Hainanese chicken Riceish Cake with Spices",
-        "Pig’s liver Soup (Soup with Pork Liver and Vegetables)",
-        "Pisang Goreng (Fried Banana Fritters)",
-        "Paru Goreng (Fried Lungs)",
-        "You tiao",
-        "Satay Bee Hoon (Rice Vermicelli with Peanut Sauce)",
-        "Sayur Lodeh (Vegetables in Coconut Milk Soup)",
+        "Ondeh Ondeh",
+        "Hainanese Chicken Rice",
+        "Indian Rojak",
+        "Grilled Fish",
+        "Kopi",
+        "Mee Pok",
+        "Mee Soto",
+        "Otak Otak",
+        "Pig liver Soup",
+        # "pig",
+        "banana fritter",
+        "Paru Goreng",
+        "You Tiao",
+        "Satay Bee Hoon",
+        "Sayur Lodeh",
         "Shredded Chicken Noodles",
-        "Soto Ayam (Yellow Spicy Chicken Soup)",
-        "Sup Tulang (Mutton Bone Stew in Spicy Sauce)",
-        "Turtle Soup (Soup Made from Turtle Meat, Considered a Delicacy)",
-        "Vegetarian Bee Hoon (Noodles with Vegetarian Mock Meats and Tofu Skin)",
+        "Soto Ayam",
+        "Sup Tulang",
+        "Turtle Soup",
+        "Vegetarian Bee Hoon",
         "Kuih Sagu",
-        "Assam Pedas (Spicy Tamarind Fish Stew)",
+        "Assam Pedas",
         "Kuih apam balik",
         "Braised pork ribs with black bean sauce",
         "Chee pah",
         "Beef Burger",
         "Rendang Hati Ayam",
-        "Yong Tau Foo (Stuffed Tofu and Vegetables in Soup or Dry Style)",
-        "Cucur Udang",
-        "Cucur Badak",
-        "Kuih Lompang",
-        "Coleslaw",
-        "Kway teow, bandung, style",
-        "Laksa Pasta (Fusion Dish Combining Local Laksa Flavors with Italian Pasta)",
-        "BBQ",
+        "Yong Tau Foo",
+
+        "Laksa Pasta",
+        # "Korean BBQ Dishes",
+        "bbq",
         "Japanese Ramen",
         "Mexican Tacos",
-        "Sushi Rolls",
-        "Brewed Coffee",
-        "Cocktails",
-        "Veg Burger",
-        "Salad",
-        "Fried Mushroom"
+        "Sushi Roll",
+        "Cold Brew Coffee",
+        # "Clarified Cocktails",
+        "cocktail",
+        "Double Cheeseburger, McDonalds",
+        "salad",
+        "fried Mushroom fritter"
+        # "Plant-Based Burgers and Meat Alternatives",
+        # "Build-Your-Own Salad Bowls",
+        # "Flame-Grilled Double Mushroom Swiss Meals"
     ]
+
 
     prompt = f"""
     Given the image of a food item, identify which of the following food classes it belongs to.
@@ -182,27 +191,24 @@ def predict_food_and_nutrition(image, model, nutrition_map, portion_size='medium
         nutrition_result = {
             "message": "Nutritional information not available for this food"
         }
-    else:
+    # else:
         # If multiple portion sizes are available, select based on preference
-        if isinstance(nutrition_info, list) and len(nutrition_info) > 0:
-            if portion_size == 'small':
-                nutrition_result = nutrition_info[0]  # smallest portion
-            elif portion_size == 'large':
-                nutrition_result = nutrition_info[-1]  # largest portion
-            else:  # medium (default)
-                mid_idx = len(nutrition_info) // 2
-                nutrition_result = nutrition_info[mid_idx]
+        # if isinstance(nutrition_info, list) and len(nutrition_info) > 0:
+        #     if portion_size == 'small':
+        #         nutrition_result = nutrition_info[0]  # smallest portion
+        #     elif portion_size == 'large':
+        #         nutrition_result = nutrition_info[-1]  # largest portion
+        #     else:  # medium (default)
+        #         mid_idx = len(nutrition_info) // 2
+        #         nutrition_result = nutrition_info[mid_idx]
 
             # Add information about available portion sizes
-            available_portions = [item['weight'] for item in nutrition_info]
-            nutrition_result['available_portions'] = available_portions
-        else:
-            nutrition_result = nutrition_info
+        # available_portions = [item['weight'] for item in nutrition_info]
+        # nutrition_result['available_portions'] = available_portions
+        # else:
+            # nutrition_result = nutrition_info
 
-    return {
-        "food_name": predicted_food.replace("_", " ").title(),
-        "nutrition": nutrition_result
-    }
+    return nutrition_info
 
 def process_image(image, model, nutrition_map, portion_size):
     """Process image and return prediction results"""

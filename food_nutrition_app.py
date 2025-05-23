@@ -375,14 +375,14 @@ def predict_food_and_nutrition(image, model, nutrition_map, portion_size='medium
 
     return nutrition_info
 
-def process_image(image, model, nutrition_map, portion_size):
+def process_image(image, model, nutrition_map):
     """Process image and return prediction results"""
     # Convert to RGB if needed
     if image.mode != "RGB":
         image = image.convert("RGB")
 
     # Get prediction
-    result = predict_food_and_nutrition(image, model, nutrition_map, portion_size)
+    result = predict_food_and_nutrition(image, model, nutrition_map)
     return result
 
 def display_results(result, image):

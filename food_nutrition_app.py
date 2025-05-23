@@ -73,7 +73,7 @@ def load_nutrition_data(file_path):
         return {}
 
 
-def predict_food_and_nutrition(image, model, nutrition_map, portion_size='medium'):
+def predict_food_and_nutrition(image, model, nutrition_map):
     """Predict food class and map to nutritional information using Gemini"""
     # Food101 class names
     class_names = [

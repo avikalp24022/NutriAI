@@ -36,27 +36,42 @@ def load_model():
 
 @st.cache_data
 def load_nutrition_data(file_path):
-    """Load nutrition data from CSV and organize by food class"""
-    try:
-        # Read the data file
-        nutrition_df = pd.read_csv(file_path)
+    """Load nutrition data from JSON file where keys are dish names."""
+    import json
 
-        # Create a dictionary to store nutrition information by food label
+    try:
+        # Read JSON file as a dict
+        with open(file_path, 'r', encoding='utf-8') as f:
+            nutrition_json = json.load(f)
+
+        # nutrition_json is a dict: {dish_name: {nutrition_fields}}
+        # Convert numeric fields to float where possible
+        numeric_cols = ['B-Carotene','Calcium','Carbohydrate','Cholesterol','Dietary fibre','Energy','Iron',
+                        'Monounsaturated fat','Phosphorus','Polyunsaturated fat','Potassium','Protein','Retinol',
+                        'Riboflavin','Saturated fat','Selenium','Sodium','Starch','Sugar','Thiamin','Total fat',
+                        'Vitamin A','Vitamin C','Vitamin D','Water','Whole-grains','Zinc']
+
         nutrition_map = {}
 
-        # Group by food label and create entries for each food
-        for label, group in nutrition_df.groupby('Dish'):
-            # Convert numeric columns to appropriate types
-            for col in ['Per Serving Household Measure','Calcium','Carbohydrate','Cholesterol','Dietary fibre','Energy','Iron','Monounsaturated fat','Phosphorus','Polyunsaturated fat','Potassium','Protein','Retinol','Riboflavin','Saturated fat','Selenium','Sodium','Starch','Sugar','Thiamin','Total fat','Vitamin A','Vitamin C','Vitamin D','Water','Whole-grains','Zinc']:
-                group[col] = pd.to_numeric(group[col], errors='coerce')
+        for dish, data in nutrition_json.items():
+            # Copy data so original isn't mutated
+            entry = data.copy()
 
-            # Store all portion sizes for each food
-            nutrition_map[label] = group.to_dict('records')
+            for col in numeric_cols:
+                val = entry.get(col, None)
+                try:
+                    entry[col] = float(val) if val not in [None, "", " "] else None
+                except Exception:
+                    entry[col] = None  # Handle parse error
+
+            nutrition_map[dish.lower().replace(" ", "_")] = entry
 
         return nutrition_map
+
     except Exception as e:
         st.error(f"Error loading nutrition data: {e}")
         return {}
+
 
 def predict_food_and_nutrition(image, model, nutrition_map, portion_size='medium'):
     """Predict food class and map to nutritional information using Gemini"""

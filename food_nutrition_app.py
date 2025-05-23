@@ -391,30 +391,30 @@ def display_results(predicted_food, nutrition_info, image):
     col1, col2 = st.columns([1, 1])
 
     with col1:
-        st.image(image, caption=f"Predicted: {result}", use_container_width=True)
+        st.image(image, caption=f"Predicted: {predicted_food}", use_container_width=True)
 
     with col2:
-        st.subheader(f"Food: {result}")
+        st.subheader(f"Food: {predicted_food}")
 
         # Display nutrition information
         st.subheader("Nutrition Information")
-        if "message" in result['nutrition']:
-            st.info(result['nutrition']['message'])
+        if "message" in nutrition_info:
+            st.info(nutrition_info['message'])
         else:
             # Create a nicely formatted nutrition card
             nutrition_card = f"""
             <div style="background-color:#f0f2f6;padding:20px;border-radius:10px;color:black;">
                 <h3 style="color:black;">Nutrition Facts</h3>
                 <hr style="border-top:1px solid black;">
-                <p><strong style="color:black;">Portion size:</strong> {result['nutrition']['weight']}g</p>
-                <p><strong style="color:black;">Calories:</strong> {result['nutrition']['calories']} kcal</p>
+                <p><strong style="color:black;">Portion size:</strong> {nutrition_info['Per Serving Household Measure']}g</p>
+                <p><strong style="color:black;">Calories:</strong> {nutrition_info['Energy']} kcal</p>
                 <hr style="border-top:1px dashed black;">
-                <p><strong style="color:black;">Protein:</strong> {result['nutrition']['protein']}g</p>
-                <p><strong style="color:black;">Carbs:</strong> {result['nutrition']['carbohydrates']}g</p>
-                <p><strong style="color:black;">Fats:</strong> {result['nutrition']['fats']}g</p>
-                <p><strong style="color:black;">Fiber:</strong> {result['nutrition']['fiber']}g</p>
-                <p><strong style="color:black;">Sugars:</strong> {result['nutrition']['sugars']}g</p>
-                <p><strong style="color:black;">Sodium:</strong> {result['nutrition']['sodium']}mg</p>
+                <p><strong style="color:black;">Protein:</strong> {nutrition_info['Protein']}g</p>
+                <p><strong style="color:black;">Carbs:</strong> {nutrition_info['Carbohydrate']}g</p>
+                <p><strong style="color:black;">Fats:</strong> {nutrition_info['Total fat']}g</p>
+                <p><strong style="color:black;">Fiber:</strong> {nutrition_info['Dietary fibre']}g</p>
+                <p><strong style="color:black;">Sugars:</strong> {nutrition_info['Sugar']}g</p>
+                <p><strong style="color:black;">Sodium:</strong> {nutrition_info['Sodium']}mg</p>
             </div>
             """
             st.markdown(nutrition_card, unsafe_allow_html=True)

@@ -383,7 +383,7 @@ def process_image(image, model, nutrition_map):
 
     # Get prediction
     predicted_food, nutrition_info = predict_food_and_nutrition(image, model, nutrition_map)
-    return predicted_food
+    return predicted_food, nutrition_info
 
 def display_results(predicted_food, nutrition_info, image):
     """Display prediction results in a user-friendly format"""

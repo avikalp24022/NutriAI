@@ -26,7 +26,7 @@ portion_size = st.sidebar.selectbox("Portion Size", ["small", "medium", "large"]
 def load_model():
     """Load and configure the Gemini Pro Vision model"""
     try:
-        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        genai.configure(api_key="AIzaSyB7J2toPbIOC0dZho2mJNIy1cReogQnmDw")
         model = genai.GenerativeModel('gemini-pro-vision')
         return model
     except Exception as e:

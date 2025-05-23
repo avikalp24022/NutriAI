@@ -47,7 +47,7 @@ def load_nutrition_data(file_path):
         # Group by food label and create entries for each food
         for label, group in nutrition_df.groupby('Dish'):
             # Convert numeric columns to appropriate types
-            for col in ['Per Serving Household Measure','B-Carotene','Calcium','Carbohydrate','Cholesterol','Dietary fibre','Energy','Iron','Monounsaturated fat','Phosphorus','Polyunsaturated fat','Potassium','Protein','Retinol','Riboflavin','Saturated fat','Selenium','Sodium','Starch','Sugar','Thiamin','Total fat','Vitamin A','Vitamin C','Vitamin D','Water','Whole-grains','Zinc']:
+            for col in ['Per Serving Household Measure','Calcium','Carbohydrate','Cholesterol','Dietary fibre','Energy','Iron','Monounsaturated fat','Phosphorus','Polyunsaturated fat','Potassium','Protein','Retinol','Riboflavin','Saturated fat','Selenium','Sodium','Starch','Sugar','Thiamin','Total fat','Vitamin A','Vitamin C','Vitamin D','Water','Whole-grains','Zinc']:
                 group[col] = pd.to_numeric(group[col], errors='coerce')
 
             # Store all portion sizes for each food

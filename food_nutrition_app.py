@@ -448,7 +448,7 @@ def main():
                 try:
                     # Process the image
                     image = Image.open(img_file_camera)
-                    result = process_image(image, model, nutrition_map, portion_size)
+                    result = process_image(image, model, nutrition_map)
 
                     # Display results
                     display_results(result, image)
@@ -467,7 +467,7 @@ def main():
                 try:
                     # Process the image
                     image = Image.open(uploaded_file)
-                    result = process_image(image, model, nutrition_map, portion_size)
+                    result = process_image(image, model, nutrition_map)
 
                     # Display results
                     display_results(result, image)

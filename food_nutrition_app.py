@@ -450,6 +450,8 @@ def main():
                     image = Image.open(img_file_camera)
                     result = process_image(image, model, nutrition_map)
 
+                    print(result)
+
                     # Display results
                     display_results(result, image)
                 except Exception as e:

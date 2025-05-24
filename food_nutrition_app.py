@@ -26,7 +26,7 @@ st.write("Take a photo or upload a food image to get nutritional information")
 def load_model():
     """Load and configure the Gemini Pro Vision model"""
     try:
-        genai.configure(api_key="AIzaSyB7J2toPbIOC0dZho2mJNIy1cReogQnmDw")
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
         model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
         return model
     except Exception as e:

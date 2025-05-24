@@ -339,7 +339,7 @@ def predict_food_and_nutrition(image, model, nutrition_map):
 
 
     prompt = f"""
-    Given the image of a food item, identify which of the following food classes it belongs to.
+    Given the image of a food item, identify which of the following singaporean food classes it belongs to.
     Only return the single best match from this list. Do not add any extra text or explanation.
 
     Food classes: {', '.join(class_names)}

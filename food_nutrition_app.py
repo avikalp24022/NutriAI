@@ -386,8 +386,6 @@ def process_image(image, model, nutrition_map):
     return predicted_food, nutrition_info
 
 def display_results(predicted_food, nutrition_info, image):
-    """Display prediction results in a user-friendly format"""
-    # Display image and prediction
     col1, col2 = st.columns([1, 1])
 
     with col1:
@@ -396,28 +394,26 @@ def display_results(predicted_food, nutrition_info, image):
     with col2:
         st.subheader(f"Food: {predicted_food}")
 
-        # Display nutrition information
         st.subheader("Nutrition Information")
-        if "message" in nutrition_info:
-            st.info(nutrition_info['message'])
+        if nutrition_info is None or "message" in nutrition_info:
+            message = nutrition_info.get("message") if nutrition_info else "Nutritional information not available."
+            st.info(message)
         else:
-            # Create a nicely formatted nutrition card
             nutrition_card = f"""
             <div style="background-color:#f0f2f6;padding:20px;border-radius:10px;color:black;">
-                <h3 style="color:black;">Nutrition Facts</h3>
-                <hr style="border-top:1px solid black;">
-                <p><strong style="color:black;">Portion size:</strong> {nutrition_info['Per Serving Household Measure']}g</p>
-                <p><strong style="color:black;">Calories:</strong> {nutrition_info['Energy']} kcal</p>
-                <hr style="border-top:1px dashed black;">
-                <p><strong style="color:black;">Protein:</strong> {nutrition_info['Protein']}g</p>
-                <p><strong style="color:black;">Carbs:</strong> {nutrition_info['Carbohydrate']}g</p>
-                <p><strong style="color:black;">Fats:</strong> {nutrition_info['Total fat']}g</p>
-                <p><strong style="color:black;">Fiber:</strong> {nutrition_info['Dietary fibre']}g</p>
-                <p><strong style="color:black;">Sugars:</strong> {nutrition_info['Sugar']}g</p>
-                <p><strong style="color:black;">Sodium:</strong> {nutrition_info['Sodium']}mg</p>
+                <h3>Nutrition Facts</h3>
+                <hr>
+                <p><strong>Calories:</strong> {nutrition_info.get('Energy', 'N/A')} kcal</p>
+                <p><strong>Protein:</strong> {nutrition_info.get('Protein', 'N/A')} g</p>
+                <p><strong>Carbohydrates:</strong> {nutrition_info.get('Carbohydrate', 'N/A')} g</p>
+                <p><strong>Total fat:</strong> {nutrition_info.get('Total fat', 'N/A')} g</p>
+                <p><strong>Dietary fibre:</strong> {nutrition_info.get('Dietary fibre', 'N/A')} g</p>
+                <p><strong>Sugars:</strong> {nutrition_info.get('Sugar', 'N/A')} g</p>
+                <p><strong>Sodium:</strong> {nutrition_info.get('Sodium', 'N/A')} mg</p>
             </div>
             """
             st.markdown(nutrition_card, unsafe_allow_html=True)
+
 
 # Main application flow
 def main():

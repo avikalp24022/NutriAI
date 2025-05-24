@@ -27,7 +27,7 @@ def load_model():
     """Load and configure the Gemini Pro Vision model"""
     try:
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        model = genai.GenerativeModel('gemini-2.5-flash-preview-04-17')
+        model = genai.GenerativeModel('gemini-2.0-flash')
         return model
     except Exception as e:
         st.error(f"Error loading model: {e}")

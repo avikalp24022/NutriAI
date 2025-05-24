@@ -380,9 +380,15 @@ def process_image(image, model, nutrition_map):
     # Convert to RGB if needed
     if image.mode != "RGB":
         image = image.convert("RGB")
+    image.thumbnail(target_size, Image.Resampling.LANCZOS)  # Updated here
+    
+    new_img = Image.new("RGB", target_size, (255, 255, 255))
+    offset = ((target_size[0] - image.size[0]) // 2,
+              (target_size[1] - image.size[1]) // 2)
+    new_img.paste(image, offset)
 
     # Get prediction
-    predicted_food, nutrition_info = predict_food_and_nutrition(image, model, nutrition_map)
+    predicted_food, nutrition_info = predict_food_and_nutrition(new_img, model, nutrition_map)
     return predicted_food, nutrition_info
 
 def display_results(predicted_food, nutrition_info, image):

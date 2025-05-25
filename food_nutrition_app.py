@@ -409,13 +409,13 @@ def display_results(predicted_food, nutrition_info, image):
             <div style="background-color:#f0f2f6;padding:20px;border-radius:10px;color:black;">
                 <h3>Nutrition Facts</h3>
                 <hr>
-                <p><strong>Calories:</strong> {nutrition_info.get('Energy', 'N/A')} kcal</p>
-                <p><strong>Protein:</strong> {nutrition_info.get('Protein', 'N/A')} g</p>
-                <p><strong>Carbohydrates:</strong> {nutrition_info.get('Carbohydrate', 'N/A')} g</p>
-                <p><strong>Total fat:</strong> {nutrition_info.get('Total fat', 'N/A')} g</p>
-                <p><strong>Dietary fibre:</strong> {nutrition_info.get('Dietary fibre', 'N/A')} g</p>
-                <p><strong>Sugars:</strong> {nutrition_info.get('Sugar', 'N/A')} g</p>
-                <p><strong>Sodium:</strong> {nutrition_info.get('Sodium', 'N/A')} mg</p>
+                <p><strong>Calories:</strong> {nutrition_info.get('Energy (kcal)', 'N/A')} kcal</p>
+                <p><strong>Protein:</strong> {nutrition_info.get('"Protein (g)', 'N/A')} g</p>
+                <p><strong>Carbohydrates:</strong> {nutrition_info.get('Carbohydrate (g)', 'N/A')} g</p>
+                <p><strong>Total fat:</strong> {nutrition_info.get('Total fat (g)', 'N/A')} g</p>
+                <p><strong>Dietary fibre:</strong> {nutrition_info.get('Dietary fibre (g)', 'N/A')} g</p>
+                <p><strong>Sugars:</strong> {nutrition_info.get('Sugar (g)', 'N/A')} g</p>
+                <p><strong>Sodium:</strong> {nutrition_info.get('Sodium (mg)', 'N/A')} mg</p>
             </div>
             """
             st.markdown(nutrition_card, unsafe_allow_html=True)

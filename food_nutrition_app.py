@@ -3,79 +3,175 @@ import google.generativeai as genai
 from PIL import Image
 import pandas as pd
 import io
+import json
 
-# Set page configuration for better mobile experience
+
+# Configuration for the Streamlit page
+PAGE_TITLE = "Food Nutrition Analyzer"
+PAGE_ICON = "🍔"
+LAYOUT = "wide"
+INITIAL_SIDEBAR_STATE = "collapsed"
+
+# Set the configuration
 st.set_page_config(
-    page_title="Food Nutrition Analyzer",
-    page_icon="🍔",
-    layout="wide",
-    initial_sidebar_state="collapsed"
+    page_title=PAGE_TITLE,
+    page_icon=PAGE_ICON,
+    layout=LAYOUT,
+    initial_sidebar_state=INITIAL_SIDEBAR_STATE
 )
 
-# App title and description
-st.title("Food Nutrition Analyzer")
+# Title of the Streamlit app
+st.title(PAGE_TITLE)
+
+# Descriptive text to inform the user what the app does
 st.write("Take a photo or upload a food image to get nutritional information")
 
-# # Create a sidebar for options
-# st.sidebar.header("Settings")
-# portion_size = st.sidebar.selectbox("Portion Size", ["small", "medium", "large"], index=1)
 
-
-# Then modify your load_model function
 @st.cache_resource
 def load_model():
-    """Load and configure the Gemini Pro Vision model"""
+    """
+    Load and configure the Generative AI model.
+
+    This function configures the Generative AI model using the Gemini API key
+    stored in Streamlit secrets. It initializes the model and caches it to avoid
+    reloading with each app interaction.
+
+    Returns:
+        An instance of the configured GenerativeModel if successful, otherwise None.
+    """
     try:
+        # Configure the generative AI with the Gemini API key
         genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
-        model = genai.GenerativeModel('gemini-2.0-flash-lite')
-        return model
-    except Exception as e:
-        st.error(f"Error loading model: {e}")
+
+        # Initialize and return the GenerativeModel
+        return genai.GenerativeModel('gemini-2.0-flash-lite')
+    except Exception as error:
+        # Display an error message if model loading fails
+        st.error(f"Error loading model: {error}")
         return None
 
 
 @st.cache_data
-def load_nutrition_data(file_path):
-    """Load nutrition data from JSON file where keys are dish names."""
-    import json
+def load_nutrition_data(nutrition_file_path: str) -> dict:
+    """
+    Load nutrition data from a JSON file.
+    
+    The JSON file is expected to be a dictionary where each key is a dish name and
+    the value is another dictionary with the following fields:
+        - B-Carotene (mcg)
+        - Calcium (mg)
+        - Carbohydrate (g)
+        - Cholesterol (mg)
+        - Dietary fibre (g)
+        - Energy (kcal)
+        - Iron (mg)
+        - Monounsaturated fat (g)
+        - Phosphorus (mg)
+        - Polyunsaturated fat (g)
+        - Potassium (mg)
+        - Protein (g)
+        - Retinol (mcg)
+        - Riboflavin (mg)
+        - Saturated fat (g)
+        - Selenium (mcg)
+        - Sodium (mg)
+        - Starch (g)
+        - Sugar (g)
+        - Thiamin (mg)
+        - Total fat (g)
+        - Vitamin A (mcg)
+        - Vitamin C (mg)
+        - Vitamin D (mcg)
+        - Water (g)
+        - Whole-grains (g)
+        - Zinc (mcg)
+    
+    The function returns a dictionary where the keys are the same as the dish
+    names in the JSON file, and the values are dictionaries with the same fields as
+    above but with numeric fields converted to float where possible.
+    """
 
     try:
         # Read JSON file as a dict
-        with open(file_path, 'r', encoding='utf-8') as f:
-            nutrition_json = json.load(f)
+        with open(nutrition_file_path, 'r', encoding='utf-8') as file:
+            nutrition_data = json.load(file)
 
-        # nutrition_json is a dict: {dish_name: {nutrition_fields}}
         # Convert numeric fields to float where possible
-        numeric_cols = ['B-Carotene','Calcium','Carbohydrate','Cholesterol','Dietary fibre','Energy','Iron',
-                        'Monounsaturated fat','Phosphorus','Polyunsaturated fat','Potassium','Protein','Retinol',
-                        'Riboflavin','Saturated fat','Selenium','Sodium','Starch','Sugar','Thiamin','Total fat',
-                        'Vitamin A','Vitamin C','Vitamin D','Water','Whole-grains','Zinc']
+        numeric_fields = [
+            'B-Carotene',
+            'Calcium',
+            'Carbohydrate',
+            'Cholesterol',
+            'Dietary fibre',
+            'Energy',
+            'Iron',
+            'Monounsaturated fat',
+            'Phosphorus',
+            'Polyunsaturated fat',
+            'Potassium',
+            'Protein',
+            'Retinol',
+            'Riboflavin',
+            'Saturated fat',
+            'Selenium',
+            'Sodium',
+            'Starch',
+            'Sugar',
+            'Thiamin',
+            'Total fat',
+            'Vitamin A',
+            'Vitamin C',
+            'Vitamin D',
+            'Water',
+            'Whole-grains',
+            'Zinc'
+        ]
 
         nutrition_map = {}
 
-        for dish, data in nutrition_json.items():
+        # Iterate over each dish in the JSON file
+        for dish, entry in nutrition_data.items():
             # Copy data so original isn't mutated
-            entry = data.copy()
+            dish_data = entry.copy()
 
-            for col in numeric_cols:
-                val = entry.get(col, None)
+            # Iterate over each numeric field
+            for field in numeric_fields:
+                # Get the value of the field
+                val = dish_data.get(field, None)
+
+                # Convert the value to float if it's not None
                 try:
-                    entry[col] = float(val) if val not in [None, "", " "] else None
+                    dish_data[field] = float(val) if val not in [None, "", " "] else None
                 except Exception:
-                    entry[col] = None  # Handle parse error
+                    # Handle parse error
+                    dish_data[field] = None
 
-            nutrition_map[dish.lower().replace(" ", "_")] = entry
+            # Add the dish to the nutrition map
+            nutrition_map[dish.lower().replace(" ", "_")] = dish_data
 
+        # Return the nutrition map
         return nutrition_map
 
     except Exception as e:
+        # Handle any errors when loading the nutrition data
         st.error(f"Error loading nutrition data: {e}")
         return {}
 
 
 def predict_food_and_nutrition(image, model, nutrition_map):
-    """Predict food class and map to nutritional information using Gemini"""
-    # Food101 class names
+    """
+    Predict food class from an image and map to nutritional information.
+    
+    Parameters:
+    - image: Image of the food item.
+    - model: Pre-trained model used for class prediction.
+    - nutrition_map: Dictionary mapping food class names to nutritional data.
+    
+    Returns:
+    - predicted_food: The predicted food class name.
+    - nutrition_info: Nutritional information for the predicted food class.
+    """
+    # List of food class names in the dataset
     class_names = [
         "Ayam penyet with rice",
         "BBQ Turkey Bacon Double Cheeseburger, Burger King",
@@ -336,8 +432,7 @@ def predict_food_and_nutrition(image, model, nutrition_map):
         "You tiao"
     ]
 
-
-
+    # Create a prompt for the model to classify the food image
     prompt = f"""
     Given the image of a food item, identify which of the following singaporean food classes it belongs to.
     Only return the single best match from this list. Do not add any extra text or explanation.
@@ -345,137 +440,152 @@ def predict_food_and_nutrition(image, model, nutrition_map):
     Food classes: {', '.join(class_names)}
     """
 
+    # Use the model to generate a response based on the prompt and image
     response = model.generate_content([prompt, image])
+    # Process the response to obtain the predicted food class name
     predicted_food = response.text.strip().lower().replace(" ", "_")
 
-    # Get nutritional information
+    # Retrieve nutritional information for the predicted food class
     nutrition_info = nutrition_map.get(predicted_food, None)
 
-    # Handle portion size selection for the nutrition data
+    # Handle case where nutritional information is not available
     if nutrition_info is None:
         nutrition_result = {
             "message": "Nutritional information not available for this food"
         }
     # else:
-        # If multiple portion sizes are available, select based on preference
-        # if isinstance(nutrition_info, list) and len(nutrition_info) > 0:
-        #     if portion_size == 'small':
-        #         nutrition_result = nutrition_info[0]  # smallest portion
-        #     elif portion_size == 'large':
-        #         nutrition_result = nutrition_info[-1]  # largest portion
-        #     else:  # medium (default)
-        #         mid_idx = len(nutrition_info) // 2
-        #         nutrition_result = nutrition_info[mid_idx]
-
-            # Add information about available portion sizes
-        # available_portions = [item['weight'] for item in nutrition_info]
-        # nutrition_result['available_portions'] = available_portions
-        # else:
-            # nutrition_result = nutrition_info
+        # Uncomment and complete this section if handling multiple portion sizes is needed
 
     return predicted_food, nutrition_info
 
-def process_image(image, model, nutrition_map):
-    """Process image and return prediction results"""
-    # Convert to RGB if needed
+def process_image(image: Image, model, nutrition_map: dict) -> tuple:
+    """Process the input image and return the predicted food and its nutritional information."""
+    target_size = (224, 224)  # Define the target size as a tuple of two integers
+
+    # Convert the image to RGB mode if it is not already.
+    # Many models expect images in RGB format.
     if image.mode != "RGB":
         image = image.convert("RGB")
-    image.thumbnail(target_size, Image.Resampling.LANCZOS)  # Updated here
-    
-    new_img = Image.new("RGB", target_size, (255, 255, 255))
+
+    # Resize the image to fit within the target size while maintaining aspect ratio.
+    # Image.Resampling.LANCZOS is used for high-quality downsampling.
+    image.thumbnail(target_size, Image.Resampling.LANCZOS)
+
+    # Create a new blank image with the target size and a white background.
+    # This is done to ensure the image fits the exact input size required by the model.
+    new_image = Image.new("RGB", target_size, (255, 255, 255))
+
+    # Calculate the offset to center the thumbnail image within the new image.
     offset = ((target_size[0] - image.size[0]) // 2,
               (target_size[1] - image.size[1]) // 2)
-    new_img.paste(image, offset)
 
-    # Get prediction
-    predicted_food, nutrition_info = predict_food_and_nutrition(new_img, model, nutrition_map)
+    # Paste the thumbnail image onto the center of the new blank image.
+    new_image.paste(image, offset)
+
+    # Use the provided model to predict the food class and fetch the corresponding nutritional information.
+    predicted_food, nutrition_info = predict_food_and_nutrition(new_image, model, nutrition_map)
+
+    # Return the predicted food class and its nutritional information.
     return predicted_food, nutrition_info
 
-def display_results(predicted_food, nutrition_info, image):
-    col1, col2 = st.columns([1, 1])
+def display_results(predicted_food: str, nutrition_info: dict, image: Image):
+    """
+    Display the predicted food name and its corresponding nutrition information
+    in a two-column layout. The first column contains the food image and the
+    second column contains a card with the predicted food name and nutrition
+    information.
 
+    Args:
+        predicted_food (str): The predicted food name.
+        nutrition_info (dict): The nutrition information for the predicted food.
+        image (Image): The input food image.
+    """
+    col1, col2 = st.columns(2)
+
+    # Column 1: Show the food image
     with col1:
-        st.image(image, caption=f"Predicted: {predicted_food}", use_container_width=True)
+        st.image(image, caption=predicted_food, use_container_width=True)
 
+    # Column 2: Show the nutrition information card
     with col2:
         st.subheader(f"Food: {predicted_food}")
-
         st.subheader("Nutrition Information")
+
         if nutrition_info is None or "message" in nutrition_info:
             message = nutrition_info.get("message") if nutrition_info else "Nutritional information not available."
             st.info(message)
         else:
-            nutrition_card = f"""
-            <div style="background-color:#f0f2f6;padding:20px;border-radius:10px;color:black;">
-                <h3>Nutrition Facts</h3>
-                <hr>
-                <p><strong>Calories:</strong> {nutrition_info.get('Energy (kcal)', 'N/A')} kcal</p>
-                <p><strong>Protein:</strong> {nutrition_info.get('"Protein (g)', 'N/A')} g</p>
-                <p><strong>Carbohydrates:</strong> {nutrition_info.get('Carbohydrate (g)', 'N/A')} g</p>
-                <p><strong>Total fat:</strong> {nutrition_info.get('Total fat (g)', 'N/A')} g</p>
-                <p><strong>Dietary fibre:</strong> {nutrition_info.get('Dietary fibre (g)', 'N/A')} g</p>
-                <p><strong>Sugars:</strong> {nutrition_info.get('Sugar (g)', 'N/A')} g</p>
-                <p><strong>Sodium:</strong> {nutrition_info.get('Sodium (mg)', 'N/A')} mg</p>
-            </div>
-            """
+            nutrition_card = (
+                "<div style='background-color:#f0f2f6;padding:20px;border-radius:10px;color:black;'>"
+                "<h3>Nutrition Facts</h3>"
+                "<hr>"
+                "<p><strong>Calories:</strong> {} kcal</p>"
+                "<p><strong>Protein:</strong> {} g</p>"
+                "<p><strong>Carbohydrates:</strong> {} g</p>"
+                "<p><strong>Total fat:</strong> {} g</p>"
+                "<p><strong>Dietary fibre:</strong> {} g</p>"
+                "<p><strong>Sugars:</strong> {} g</p>"
+                "<p><strong>Sodium:</strong> {} mg</p>"
+                "</div>"
+            ).format(
+                nutrition_info.get('Energy (kcal)', 'N/A'),
+                nutrition_info.get('Protein (g)', 'N/A'),
+                nutrition_info.get('Carbohydrate (g)', 'N/A'),
+                nutrition_info.get('Total fat (g)', 'N/A'),
+                nutrition_info.get('Dietary fibre (g)', 'N/A'),
+                nutrition_info.get('Sugar (g)', 'N/A'),
+                nutrition_info.get('Sodium (mg)', 'N/A')
+            )
+
             st.markdown(nutrition_card, unsafe_allow_html=True)
 
 
 # Main application flow
 def main():
-    """Main function to run the Streamlit app"""
+    """Main function to run the Streamlit app."""
+
     # Load model and nutrition data
-    with st.spinner("Loading model and nutrition data..."):
-        model = load_model()
-        nutrition_map = load_nutrition_data("Final_key_value_pair.json")
+    model = load_model()
+    nutrition_map = load_nutrition_data("Final_key_value_pair.json")
 
     # Check if model loaded correctly
     if model is None:
         st.error("Failed to load the model. Please check your API key and refresh.")
         return
 
-    # Tabs for camera or upload options
-    tab1, tab2 = st.tabs(["Take Photo 📸", "Upload Image 📁"])
+    # Create tabs for camera or upload options
+    tabs = st.tabs(["Take Photo", "Upload Image"])
 
     # Camera input tab
-    with tab1:
+    with tabs[0]:
         st.subheader("Use Camera")
+
         st.write("Click the button below to access your device camera")
 
-        # Camera input widget
-        img_file_camera = st.camera_input("Take a picture of food")
+        img_file = st.camera_input("Take a picture of food")
 
-        if img_file_camera is not None:
+        if img_file is not None:
             with st.spinner("Analyzing food..."):
                 try:
-                    # Process the image
-                    image = Image.open(img_file_camera)
+                    image = Image.open(img_file)
                     predicted_food, nutrition_info = process_image(image, model, nutrition_map)
-
-                    # print(result)
-
-                    # Display results
                     display_results(predicted_food, nutrition_info, image)
                 except Exception as e:
                     st.error(f"Error processing image: {e}")
 
     # File upload tab
-    with tab2:
+    with tabs[1]:
         st.subheader("Upload Food Image")
 
-        # File uploader widget
+        st.write("Upload an image of food from your computer or mobile device")
+
         uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "jpeg", "png"])
 
         if uploaded_file is not None:
             with st.spinner("Analyzing food..."):
                 try:
-                    # Process the image
                     image = Image.open(uploaded_file)
                     predicted_food, nutrition_info = process_image(image, model, nutrition_map)
-
-                    # print(result)
-
-                    # Display results
                     display_results(predicted_food, nutrition_info, image)
                 except Exception as e:
                     st.error(f"Error processing image: {e}")

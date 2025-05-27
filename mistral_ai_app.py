@@ -102,7 +102,7 @@ def predict_food_and_nutrition(image_b64: str, nutrition_map: dict):
     # Set the API URL and headers
     api_url = "https://integrate.api.nvidia.com/v1/chat/completions"
     headers = {
-        "Authorization": "Bearer API-key",
+        "Authorization": f"Bearer {st.secrets['MISTRAL_API_KEY']}",
         "Content-Type": "application/json"
     }
 

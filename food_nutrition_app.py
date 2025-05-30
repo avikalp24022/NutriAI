@@ -434,10 +434,9 @@ def predict_food_and_nutrition(image, model, nutrition_map):
 
     # Create a prompt for the model to classify the food image
     prompt = f"""
-    Given the image of a food item, identify which of the following singaporean food classes it belongs to.
-    Only return the single best match from this list. Do not add any extra text or explanation.
-
+    You are a culinary expert specializing in Singaporean cuisine. Given an image of a food item, first carefully examine its visual appearance, ingredients, and likely cooking techniques to infer how it was prepared. Based on this analysis, classify the dish into one of the following categories:
     Food classes: {', '.join(class_names)}
+    Respond with only the exact name of the single best-matching food class from the list above. Do not include any additional text or explanation.
     """
 
     # Use the model to generate a response based on the prompt and image

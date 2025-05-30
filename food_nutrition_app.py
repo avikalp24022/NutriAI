@@ -594,9 +594,9 @@ def main():
         if img_file is not None:
             with st.spinner("Analyzing food..."):
                 try:
-                    image = Image.open(img_file)
-                    predicted_food, nutrition_info = process_image(image, model, nutrition_map)
-                    display_results(predicted_food, nutrition_info, image)
+                    captured_image = Image.open(img_file)
+                    predicted_food, nutrition_info = process_image(captured_image, model, nutrition_map)
+                    display_results(predicted_food, nutrition_info, captured_image)
                 except Exception as e:
                     st.error(f"Error processing image: {e}")
 
@@ -611,9 +611,9 @@ def main():
         if uploaded_file is not None:
             with st.spinner("Analyzing food..."):
                 try:
-                    image = Image.open(uploaded_file)
-                    predicted_food, nutrition_info = process_image(image, model, nutrition_map)
-                    display_results(predicted_food, nutrition_info, image)
+                    uploaded_image = Image.open(uploaded_file)
+                    predicted_food, nutrition_info = process_image(uploaded_image, model, nutrition_map)
+                    display_results(predicted_food, nutrition_info, uploaded_image)
                 except Exception as e:
                     st.error(f"Error processing image: {e}")
 

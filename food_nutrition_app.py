@@ -468,8 +468,10 @@ def predict_food_and_nutrition(image, model):
     # Create a prompt for the model to classify the food image
     prompt = f"""
     You are a culinary expert specializing in Singaporean cuisine. Given an image of a food item, first carefully examine its visual appearance, ingredients, and likely cooking techniques to infer how it was prepared. Based on this analysis, classify the dish into one of the following categories:
-    Food classes: {', '.join(class_names)}
-    After identifying the most promising dish, recall the ingredients used in making that dish and list them in the response accordingly.
+    Food classes: [{', '.join(class_names)}]
+    If you are confident that the dish is not listed above, set dishName to your most promising guess based on its appearance and ingredients.
+    After identifying the most promising dish,list the typical ingredients used to make it (based on an average recipe) and list them in the response accordingly.
+    In case of Nutrition information use average values.
     """
     prompt+="""Respond as a JSON String in the following format and nothing else:
         {
@@ -478,11 +480,11 @@ def predict_food_and_nutrition(image, model):
         "Nutrients": {
             "Protein": x,        // in grams (integer)
             "Total Fat": y,            // in grams (integer)
-            "Carbohydrates": z   // in grams (integer)
-            "Calories:": a, // in kcal (integer)
+            "Carbohydrates": z,   // in grams (integer)
+            "Calories": a, // in kcal (integer)
             "Sugars": b, // in grams (integer)
             "Sodium": c, // in mg (integer)
-            "Per Serving Household Measure" : z // in grams (integer)
+            "Per Serving Household Measure" : d // in grams (integer)
             }
         }
         Do not include any additional text or explanation.

@@ -513,7 +513,7 @@ def predict_food_and_nutrition(image, model):
 def process_image(image: Image, model):
     """Process the input image and return the predicted food and its nutritional information."""
     # Make a copy of the original image for display
-    # display_image = image.copy()
+    display_image = image.copy()
     
     # Convert to RGB if needed
     if image.mode != "RGB":
@@ -540,7 +540,7 @@ def process_image(image: Image, model):
     food_data = predict_food_and_nutrition(new_image, model)
 
     # Return both the predictions and the unmodified display image
-    return food_data
+    return food_data, display_image
 
 def display_results(food_data, image=None, nutrition_map=None):
     """
@@ -650,8 +650,8 @@ def main():
             with st.spinner("Analyzing food..."):
                 try:
                     captured_image = Image.open(img_file)
-                    food_data = process_image(captured_image, model)
-                    display_results(food_data,captured_image,nutrition_map)
+                    food_data, display_image = process_image(captured_image, model)
+                    display_results(food_data, display_image, nutrition_map)
                 except Exception as e:
                     st.error(f"Error processing image (click): {e}")
 
@@ -667,9 +667,8 @@ def main():
             with st.spinner("Analyzing food..."):
                 try:
                     uploaded_image = Image.open(uploaded_file)
-                    food_data = process_image(uploaded_image, model)
-                    # Fix: Changed parameter order to match the function definition
-                    display_results(food_data, uploaded_image,nutrition_map)  # Changed from display_results(uploaded_image, food_data)
+                    food_data, display_image = process_image(uploaded_image, model)
+                    display_results(food_data, display_image, nutrition_map)
                 except Exception as e:
                     st.error(f"Error processing image (upload): {e}")
 

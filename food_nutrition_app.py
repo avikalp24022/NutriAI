@@ -512,34 +512,34 @@ def predict_food_and_nutrition(image, model):
 
 def process_image(image: Image, model):
     """Process the input image and return the predicted food and its nutritional information."""
-    target_size = (224, 224)  # Define the target size as a tuple of two integers
-
-    # Convert the image to RGB mode if it is not already.
-    # Many models expect images in RGB format.
+    # Make a copy of the original image for display
+    # display_image = image.copy()
+    
+    # Convert to RGB if needed
     if image.mode != "RGB":
         image = image.convert("RGB")
+    
+    # Create a copy for model processing
+    model_image = image.copy()
+    target_size = (224, 224)
 
-    # Resize the image to fit within the target size while maintaining aspect ratio.
-    # Image.Resampling.LANCZOS is used for high-quality downsampling.
-    image.thumbnail(target_size, Image.Resampling.LANCZOS)
+    # Resize the model image copy
+    model_image.thumbnail(target_size, Image.Resampling.LANCZOS)
 
-    # Create a new blank image with the target size and a white background.
-    # This is done to ensure the image fits the exact input size required by the model.
+    # Create a new blank image for the model
     new_image = Image.new("RGB", target_size, (255, 255, 255))
 
-    # Calculate the offset to center the thumbnail image within the new image.
-    offset = ((target_size[0] - image.size[0]) // 2,
-              (target_size[1] - image.size[1]) // 2)
+    # Calculate the offset to center the thumbnail
+    offset = ((target_size[0] - model_image.size[0]) // 2,
+              (target_size[1] - model_image.size[1]) // 2)
 
-    # Paste the thumbnail image onto the center of the new blank image.
-    new_image.paste(image, offset)
+    # Paste the thumbnail onto the new image
+    new_image.paste(model_image, offset)
 
-    # Use the provided model to predict the food class and fetch the corresponding nutritional information.
-    # predicted_food, nutrition_info = predict_food_and_nutrition(new_image, model, nutrition_map)
+    # Get predictions using the model-sized image
     food_data = predict_food_and_nutrition(new_image, model)
 
-    # Return the predicted food class and its nutritional information.
-    # return predicted_food, nutrition_info
+    # Return both the predictions and the unmodified display image
     return food_data
 
 def display_results(food_data, image=None, nutrition_map=None):

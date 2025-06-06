@@ -1,3 +1,4 @@
 .streamlit/secrets.toml
 # Ignore the secrets file for Streamlit
 secrets.toml
+.env

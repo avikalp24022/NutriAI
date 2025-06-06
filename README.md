@@ -48,7 +48,20 @@ NutriAI is a food nutrition analysis application that uses machine learning to p
 To install the required dependencies, run the following command:
 
 ```bash
-pip install -r requirements.txt
+# 1. Install Python venv module if missing
+sudo apt install python3-venv -y
+
+# 2. Create a virtual environment in your project directory
+python3 -m venv .venv
+
+# 3. Activate the virtual environment
+source .venv/bin/activate
+
+# 4. Now install your Python packages using pip
+pip install streamlit==1.45.0 \
+            google-generativeai \
+            Pillow==11.2.1 \
+            pandas==2.2.3
 ```
 
 ## Usage

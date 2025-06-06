@@ -4,6 +4,11 @@ from PIL import Image
 import pandas as pd
 import io
 import json
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 
 # Configuration for the Streamlit page
@@ -33,15 +38,19 @@ def load_model():
     Load and configure the Generative AI model.
 
     This function configures the Generative AI model using the Gemini API key
-    stored in Streamlit secrets. It initializes the model and caches it to avoid
+    stored in environment variables. It initializes the model and caches it to avoid
     reloading with each app interaction.
 
     Returns:
         An instance of the configured GenerativeModel if successful, otherwise None.
     """
     try:
-        # Configure the generative AI with the Gemini API key
-        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        # Configure the generative AI with the Gemini API key from environment
+        api_key = os.getenv("GEMINI_API_KEY")
+        if not api_key:
+            raise ValueError("GEMINI_API_KEY not found in environment variables")
+
+        genai.configure(api_key=api_key)
 
         # Initialize and return the GenerativeModel
         return genai.GenerativeModel('gemini-2.0-flash-lite')

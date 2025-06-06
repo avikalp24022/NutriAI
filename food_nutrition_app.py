@@ -41,8 +41,7 @@ def load_model():
     """
     try:
         # Configure the generative AI with the Gemini API key
-        genai.configure(api_key="AIzaSyD1XnJp9s3WFF0G7zvLcXk4gNIIYPcdzgY")
-        # genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
+        genai.configure(api_key=st.secrets["GEMINI_API_KEY"])
 
         # Initialize and return the GenerativeModel
         return genai.GenerativeModel('gemini-2.0-flash-lite')

@@ -61,7 +61,8 @@ source .venv/bin/activate
 pip install streamlit==1.45.0 \
             google-generativeai \
             Pillow==11.2.1 \
-            pandas==2.2.3
+            pandas==2.2.3 \
+            python-dotenv
 ```
 
 ## Usage

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Food Nutrition Analyzer</title>
+  <title>DishVision</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
@@ -104,6 +104,29 @@
       color: #222;
       font-size: 1.05rem;
     }
+    .custom-file-input {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      height: 2.5rem;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #f6f8fa;
+      border: 2px dashed #ccc;
+      text-align: center;
+      line-height: 2.5rem;
+      color: #666;
+      cursor: pointer;
+    }
+    .custom-file-input input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
     @media (max-width: 900px) {
       .main-container {
         flex-direction: column;
@@ -124,11 +147,13 @@
       <div>
         <div class="food-title">
           <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1200px-Good_Food_Display_-_NCI_Visuals_Online.jpg" class="food-logo" alt="Food Logo"/>
-          Food Nutrition Analyzer
+          DishVision
         </div>
         <div class="input-section">
           <label for="food-image">Upload Food Image</label>
-          <input type="file" id="food-image" accept="image/png, image/jpeg, image/jpg">
+          <div class="custom-file-input">
+            <input type="file" id="food-image" accept="image/png, image/jpeg, image/jpg">
+          </div>
           <button class="food-button" id="analyze-btn">&#9654;&#xFE0F; Analyze Food</button>
         </div>
         <div class="result-section" id="result-section">
@@ -170,7 +195,23 @@
         if (data.error) {
           resultSection.innerHTML = `<span style='color:#c00'>${data.error}</span>`;
         } else {
-          resultSection.innerHTML = `<b>Dish:</b> ${data.dishName}<br><b>Ingredients:</b> ${(data.Ingredients||[]).join(', ')}<br><b>Calories:</b> ${data.Nutrients.Calories} kcal<br><b>Protein:</b> ${data.Nutrients.Protein}g<br><b>Fat:</b> ${data.Nutrients['Total Fat']}g<br><b>Carbs:</b> ${data.Nutrients.Carbohydrates}g<br><b>Sugars:</b> ${data.Nutrients.Sugars}g<br><b>Sodium:</b> ${data.Nutrients.Sodium}mg`;
+          resultSection.innerHTML = `
+            <div><b>Dish:</b> ${data.dishName}</div>
+            <hr>
+            <div><b>Ingredients:</b> ${(data.Ingredients || []).join(', ')}</div>
+            <hr>
+            <div><b>Nutrition:</b></div>
+            <ul>
+              <li><b>Calories:</b> ${data.Nutrients.Calories} kcal</li>
+              <li><b>Protein:</b> ${data.Nutrients.Protein}g</li>
+              <li><b>Fat:</b> ${data.Nutrients['Total Fat']}g</li>
+              <li><b>Carbs:</b> ${data.Nutrients.Carbohydrates}g</li>
+              <li><b>Sugars:</b> ${data.Nutrients.Sugars}g</li>
+              <li><b>Sodium:</b> ${data.Nutrients.Sodium}mg</li>
+            </ul>
+            <hr>
+            <div><b>Per Serving:</b> ${data.Nutrients['Per Serving Household Measure']}g</div>
+          `;
         }
       } catch (err) {
         resultSection.innerHTML = `<span style='color:#c00'>${err}</span>`;

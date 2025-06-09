@@ -1,5 +1,1 @@
-.streamlit/secrets.toml
-# Ignore the secrets file for Streamlit
-secrets.toml
-.env
-Flask-server/.env
+backend/.env

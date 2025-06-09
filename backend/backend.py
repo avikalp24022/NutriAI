@@ -65,18 +65,19 @@ def predict_food_and_nutrition(image, model):
 @app.route('/analyze', methods=['POST'])
 def analyze():
     try:
-        data = request.json
+        data = request.get_json()
         image_data = data.get('image')
         if not image_data:
             return jsonify({'error': 'No image provided'}), 400
 
-        # Check for proper base64 prefix
         if ',' in image_data:
-            image_data = image_data.split(',')[1]  # strip metadata
+            header, image_data = image_data.split(',', 1)
 
         try:
             image_bytes = base64.b64decode(image_data)
             image = Image.open(io.BytesIO(image_bytes))
+            image.verify()  # Check validity
+            image = Image.open(io.BytesIO(image_bytes))  # Reload after verify
         except Exception as e:
             return jsonify({'error': f'Image decoding failed: {str(e)}'}), 400
 

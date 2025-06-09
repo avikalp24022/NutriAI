@@ -167,56 +167,66 @@
     </div>
   </div>
   <script>
-    function toBase64(file) {
-      return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('analyze-btn').onclick = async function() {
+    const fileInput = document.getElementById('food-image');
+    const resultSection = document.getElementById('result-section');
+    const mascotImage = document.querySelector('.food-mascot'); // Select the mascot image element
+
+    if (!fileInput.files.length) {
+      resultSection.innerHTML = '<span style="color:#c00">Please upload a food image first.</span>';
+      return;
     }
-    document.getElementById('analyze-btn').onclick = async function() {
-      const fileInput = document.getElementById('food-image');
-      const resultSection = document.getElementById('result-section');
-      if (!fileInput.files.length) {
-        resultSection.innerHTML = '<span style="color:#c00">Please upload a food image first.</span>';
-        return;
+
+    const file = fileInput.files[0];
+    resultSection.innerHTML = 'Analyzing...';
+
+    try {
+      const base64 = await toBase64(file);
+
+      // Update the right pane with the uploaded image
+      mascotImage.src = base64;
+
+      const response = await fetch('http://localhost:5001/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64 })
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        resultSection.innerHTML = `<span style='color:#c00'>${data.error}</span>`;
+      } else {
+        resultSection.innerHTML = `
+          <div><b>Dish:</b> ${data.dishName}</div>
+          <hr>
+          <div><b>Ingredients:</b> ${(data.Ingredients || []).join(', ')}</div>
+          <hr>
+          <div><b>Nutrition:</b></div>
+          <ul>
+            <li><b>Calories:</b> ${data.Nutrients.Calories} kcal</li>
+            <li><b>Protein:</b> ${data.Nutrients.Protein}g</li>
+            <li><b>Fat:</b> ${data.Nutrients['Total Fat']}g</li>
+            <li><b>Carbs:</b> ${data.Nutrients.Carbohydrates}g</li>
+            <li><b>Sugars:</b> ${data.Nutrients.Sugars}g</li>
+            <li><b>Sodium:</b> ${data.Nutrients.Sodium}mg</li>
+          </ul>
+          <hr>
+          <div><b>Per Serving:</b> ${data.Nutrients['Per Serving Household Measure']}g</div>
+        `;
       }
-      const file = fileInput.files[0];
-      resultSection.innerHTML = 'Analyzing...';
-      try {
-        const base64 = await toBase64(file);
-        const response = await fetch('http://localhost:5001/analyze', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ image: base64 })
-        });
-        const data = await response.json();
-        if (data.error) {
-          resultSection.innerHTML = `<span style='color:#c00'>${data.error}</span>`;
-        } else {
-          resultSection.innerHTML = `
-            <div><b>Dish:</b> ${data.dishName}</div>
-            <hr>
-            <div><b>Ingredients:</b> ${(data.Ingredients || []).join(', ')}</div>
-            <hr>
-            <div><b>Nutrition:</b></div>
-            <ul>
-              <li><b>Calories:</b> ${data.Nutrients.Calories} kcal</li>
-              <li><b>Protein:</b> ${data.Nutrients.Protein}g</li>
-              <li><b>Fat:</b> ${data.Nutrients['Total Fat']}g</li>
-              <li><b>Carbs:</b> ${data.Nutrients.Carbohydrates}g</li>
-              <li><b>Sugars:</b> ${data.Nutrients.Sugars}g</li>
-              <li><b>Sodium:</b> ${data.Nutrients.Sodium}mg</li>
-            </ul>
-            <hr>
-            <div><b>Per Serving:</b> ${data.Nutrients['Per Serving Household Measure']}g</div>
-          `;
-        }
-      } catch (err) {
-        resultSection.innerHTML = `<span style='color:#c00'>${err}</span>`;
-      }
-    };
+    } catch (err) {
+      resultSection.innerHTML = `<span style='color:#c00'>${err}</span>`;
+    }
+  };
   </script>
 </body>
 </html>

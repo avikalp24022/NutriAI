@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DishVision</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1200px-Good_Food_Display_-_NCI_Visuals_Online.jpg">
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #0a5dbb 0%, #0a5dbb 100%);
+      font-family: 'Inter', Arial, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .main-container {
+      display: flex;
+      gap: 2.5rem;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      min-height: 100vh;
+    }
+    .card {
+      background: #fff;
+      border-radius: 2rem;
+      box-shadow: 0 4px 32px rgba(0,0,0,0.08);
+      padding: 2.5rem 2rem 2rem 2rem;
+      min-width: 420px;
+      min-height: 600px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .card-right {
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      min-width: 320px;
+      min-height: 600px;
+    }
+    .food-title {
+      font-size: 1.6rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .food-logo {
+      height: 32px;
+    }
+    .food-mascot {
+      width: 220px;
+      height: 320px;
+      object-fit: contain;
+      margin: auto;
+      display: block;
+    }
+    .food-button {
+      background: linear-gradient(90deg, #7b7be5 0%, #a16ae8 100%);
+      color: #fff;
+      border: none;
+      border-radius: 12px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 0.9rem 0;
+      width: 100%;
+      margin-top: 2rem;
+      box-shadow: 0 2px 8px rgba(100,100,200,0.08);
+      transition: background 0.2s;
+      cursor: pointer;
+    }
+    .food-button:hover {
+      background: linear-gradient(90deg, #a16ae8 0%, #7b7be5 100%);
+    }
+    .input-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-top: 2rem;
+    }
+    .input-section label {
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: #222;
+    }
+    .input-section input[type="file"] {
+      margin-bottom: 1.5rem;
+    }
+    .result-section {
+      margin-top: 2rem;
+      background: #f6f8fa;
+      border-radius: 1rem;
+      padding: 1.2rem 1rem;
+      min-height: 120px;
+      color: #222;
+      font-size: 1.05rem;
+    }
+    .custom-file-input {
+      position: relative;
+      display: inline-block;
+      width: 100%;
+      height: 2.5rem;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #f6f8fa;
+      border: 2px dashed #ccc;
+      text-align: center;
+      line-height: 2.5rem;
+      color: #666;
+      cursor: pointer;
+    }
+    .custom-file-input input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      cursor: pointer;
+    }
+    @media (max-width: 900px) {
+      .main-container {
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: 2rem 0;
+      }
+      .card, .card-right {
+        min-width: 90vw;
+        min-height: 350px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="main-container">
+    <!-- Left Card -->
+    <div class="card">
+      <div>
+        <div class="food-title">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/6/6d/Good_Food_Display_-_NCI_Visuals_Online.jpg/1200px-Good_Food_Display_-_NCI_Visuals_Online.jpg" class="food-logo" alt="Food Logo"/>
+          DishVision
+        </div>
+        <div class="input-section">
+          <label for="food-image">Upload Food Image</label>
+          <div class="custom-file-input">
+            <input type="file" id="food-image" accept="image/png, image/jpeg, image/jpg">
+          </div>
+          <button class="food-button" id="analyze-btn">&#9654;&#xFE0F; Analyze Food</button>
+        </div>
+        <div class="result-section" id="result-section">
+          <!-- Results will appear here -->
+        </div>
+      </div>
+    </div>
+    <!-- Right Card -->
+    <div class="card card-right">
+      <img src="https://cdn-icons-png.flaticon.com/512/2276/2276931.png" class="food-mascot" alt="Mascot"/>
+    </div>
+  </div>
+  <script>
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  document.getElementById('analyze-btn').onclick = async function() {
+    const fileInput = document.getElementById('food-image');
+    const resultSection = document.getElementById('result-section');
+    const mascotImage = document.querySelector('.food-mascot'); // Select the mascot image element
+
+    if (!fileInput.files.length) {
+      resultSection.innerHTML = '<span style="color:#c00">Please upload a food image first.</span>';
+      return;
+    }
+
+    const file = fileInput.files[0];
+    resultSection.innerHTML = 'Analyzing...';
+
+    try {
+      const base64 = await toBase64(file);
+
+      // Update the right pane with the uploaded image
+      mascotImage.src = base64;
+
+      const response = await fetch('http://localhost:5001/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: base64 })
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        resultSection.innerHTML = `<span style='color:#c00'>${data.error}</span>`;
+      } else {
+        resultSection.innerHTML = `
+          <div><b>Dish:</b> ${data.dishName}</div>
+          <hr>
+          <div><b>Ingredients:</b> ${(data.Ingredients || []).join(', ')}</div>
+          <hr>
+          <div><b>Nutrition:</b></div>
+          <ul>
+            <li><b>Calories:</b> ${data.Nutrients.Calories} kcal</li>
+            <li><b>Protein:</b> ${data.Nutrients.Protein}g</li>
+            <li><b>Fat:</b> ${data.Nutrients['Total Fat']}g</li>
+            <li><b>Carbs:</b> ${data.Nutrients.Carbohydrates}g</li>
+            <li><b>Sugars:</b> ${data.Nutrients.Sugars}g</li>
+            <li><b>Sodium:</b> ${data.Nutrients.Sodium}mg</li>
+          </ul>
+          <hr>
+          <div><b>Per Serving:</b> ${data.Nutrients['Per Serving Household Measure']}g</div>
+        `;
+      }
+    } catch (err) {
+      resultSection.innerHTML = `<span style='color:#c00'>${err}</span>`;
+    }
+  };
+  </script>
+</body>
+</html>

@@ -42,13 +42,17 @@ def predict_food_and_nutrition(image, model):
         "dishName": "the food dish name",
         "Ingredients": [ /* list of ingredients recalled; empty if not food */ ],
         "Nutrients": {
-            "Protein": x,        // in grams (integer)
-            "Total Fat": y,      // in grams (integer)
-            "Carbohydrates": z,  // in grams (integer)
-            "Calories": a,       // in kcal (integer)
-            "Sugars": b,         // in grams (integer)
-            "Sodium": c,         // in mg (integer)
-            "Per Serving Household Measure": d // in grams (integer)
+            "Protein": ["Protein (g)", "Protein"],
+            "Total Fat": ["Total fat (g)", "Total Fat"],
+            "Carbohydrates": ["Carbohydrate (g)", "Carbohydrates"],
+            "Calories": ["Energy (kcal)", "Calories"],
+            "Sugars": ["Sugar (g)", "Sugars"],
+            "Sodium": ["Sodium (mg)", "Sodium"],
+            "Per Serving Household Measure": ["Per Serving Household Measure"],
+            "Iron": ["Iron (mg)", "Iron"],
+            "Vitamin A": ["Vitamin A (mcg)", "Vitamin A"],
+            "Vitamin C": ["Vitamin C (mg)", "Vitamin C"],
+            "Vitamin D": ["Vitamin D (IU)", "Vitamin D"]
             }
         }
         Do not include any additional text or explanation.

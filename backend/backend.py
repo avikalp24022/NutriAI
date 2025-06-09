@@ -70,23 +70,33 @@ def analyze():
         if not image_data:
             return jsonify({'error': 'No image provided'}), 400
 
+        # Debugging log
+        print("Received base64 string (start):", image_data[:50])
+
+        # Clean base64
         if ',' in image_data:
-            header, image_data = image_data.split(',', 1)
+            _, image_data = image_data.split(',', 1)
 
         try:
             image_bytes = base64.b64decode(image_data)
             image = Image.open(io.BytesIO(image_bytes))
-            image.verify()  # Check validity
-            image = Image.open(io.BytesIO(image_bytes))  # Reload after verify
+            image.verify()
+            image = Image.open(io.BytesIO(image_bytes))
         except Exception as e:
+            print("❌ Image decode error:", e)
             return jsonify({'error': f'Image decoding failed: {str(e)}'}), 400
 
-        model = load_model()
-        food_data = predict_food_and_nutrition(image, model)
-        return jsonify(food_data)
+        try:
+            model = load_model()
+            food_data = predict_food_and_nutrition(image, model)
+            return jsonify(food_data)
+        except Exception as e:
+            print("❌ Model/generation error:", e)
+            return jsonify({'error': f'Model failed: {str(e)}'}), 500
 
     except Exception as e:
-        return jsonify({'error': str(e)}), 500
+        print("❌ Outer error:", e)
+        return jsonify({'error': f'Server crash: {str(e)}'}), 500
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5001, debug=True)

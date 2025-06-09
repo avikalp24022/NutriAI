@@ -69,12 +69,21 @@ def analyze():
         image_data = data.get('image')
         if not image_data:
             return jsonify({'error': 'No image provided'}), 400
-        # Decode base64 image
-        image_bytes = base64.b64decode(image_data.split(',')[-1])
-        image = Image.open(io.BytesIO(image_bytes))
+
+        # Check for proper base64 prefix
+        if ',' in image_data:
+            image_data = image_data.split(',')[1]  # strip metadata
+
+        try:
+            image_bytes = base64.b64decode(image_data)
+            image = Image.open(io.BytesIO(image_bytes))
+        except Exception as e:
+            return jsonify({'error': f'Image decoding failed: {str(e)}'}), 400
+
         model = load_model()
         food_data = predict_food_and_nutrition(image, model)
         return jsonify(food_data)
+
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 

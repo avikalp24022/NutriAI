@@ -195,7 +195,7 @@
       // Update the right pane with the uploaded image
       mascotImage.src = base64;
 
-      const response = await fetch('http://localhost:5001/analyze', {
+      const response = await fetch('https://nutri-ai.roamify.tech/analyze', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: base64 })
